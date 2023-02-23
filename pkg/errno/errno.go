@@ -49,6 +49,9 @@ var (
 	UserAlreadyExistErr    = NewErrNo(int64(user.ErrCode_UserAlreadyExistErrCode), "User already exists")
 	AuthorizationFailedErr = NewErrNo(int64(user.ErrCode_AuthorizationFailedErrCode), "Authorization failed")
 	ReapteOperationErr     = NewErrNo(int64(10005), "请勿重复操作")
+	LoginErr               = NewErrNo(int64(10006), "用户名或密码不正确")
+	EmailErr               = NewErrNo(int64(10007), "邮箱格式错误")
+	DataErr                = NewErrNo(int64(10008), "数据找不到")
 )
 
 // ConvertErr convert error to Errno

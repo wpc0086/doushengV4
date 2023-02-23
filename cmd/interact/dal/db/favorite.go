@@ -24,21 +24,23 @@ type Favorite struct {
 	VideoId    int64 `json:"video_id" gorm:"index:vu,priority:1" ` //复合索引
 	UserId     int64 `json:"user_id" gorm:"index:vu,priority:2" gorm:"index:ua,priority:3"`
 	ActionType int32 `json:"action_type" gorm:"index:ua,priority:4"` //1-点赞，2-取消点赞
-	DelateAt   bool  `json:"delate_at" gorm:"index"`
+	DelateAt   bool  `json:"delate_at" gorm:"index:vu,priority:3"`
 }
 
-func AddFavorite(videoId int64, userId int64, actionType int32, addNum int64) error {
+func ModifyFavorite(videoId int64, userId int64, num int64) error {
 	return DB.Transaction(func(tx *gorm.DB) error {
 		//1、操作favorite表
 		var favorite Favorite
 		//1.1、是否存在数据，判断要更新还是要创建
-		tx.Debug().First(&favorite, "video_id = ? AND user_id = ?", videoId, userId)
+		tx.Debug().First(&favorite, "video_id = ? AND user_id = ? AND delate_at = ?", videoId, userId, false)
 		if favorite.Id == 0 {
+			//没有就点赞，有就取消点赞
 			favorite.UserId = userId
 			favorite.VideoId = videoId
-			favorite.ActionType = actionType
+			favorite.ActionType = 1
 		} else {
-			favorite.ActionType = actionType
+			favorite.ActionType = 2
+			favorite.DelateAt = true
 		}
 		//1.2、保存
 		err := tx.Debug().Save(&favorite).Error
@@ -54,11 +56,20 @@ func AddFavorite(videoId int64, userId int64, actionType int32, addNum int64) er
 		}
 		favriteNum := int64(video.FavoriteCount)
 		//UpdateFavoriteToVideo
-		favoriteCount := favriteNum + addNum
-		video = Video{}
-		err = tx.Model(&video).Where("id = ?", videoId).Update("favorite_count", favoriteCount).Error
-		if err != nil {
-			return err
+		if favorite.ActionType == 1 {
+			favoriteCount := favriteNum + num
+			video = Video{}
+			err = tx.Model(&video).Where("id = ?", videoId).Update("favorite_count", favoriteCount).Error
+			if err != nil {
+				return err
+			}
+		} else {
+			favoriteCount := favriteNum - num
+			video = Video{}
+			err = tx.Model(&video).Where("id = ?", videoId).Update("favorite_count", favoriteCount).Error
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})

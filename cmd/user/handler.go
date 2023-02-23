@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"doushengV4/cmd/user/dal/redis"
 	"doushengV4/cmd/user/pack"
 	"doushengV4/cmd/user/service"
 	user "doushengV4/kitex_gen/user"
@@ -54,9 +55,13 @@ func (s *UserServiceImpl) LoginUser(ctx context.Context, req *user.LoginUserRequ
 
 // InforUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) InforUser(ctx context.Context, req *user.InfoUserRequest) (resp *user.InfoUserResponse, err error) {
+	if redis.GetErr(ctx, req.Token) == true { //防止缓存穿透
+		return nil, errno.DataErr
+	}
 	infoUser, err := service.NewInfoUserService(ctx).InfoUser(req)
 	if err != nil {
 		resp = pack.BuildInfoResp(err)
+		redis.SaveErr(ctx, req.Token) //防止缓存穿透
 		return resp, nil
 	}
 	resp = &user.InfoUserResponse{StatusCode: int32(user.ErrCode_SuccessCode), User: infoUser}

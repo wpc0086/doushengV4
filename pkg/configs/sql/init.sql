@@ -1,24 +1,79 @@
-CREATE TABLE `user`
+create table comments
 (
-    `id`         bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    `username`   varchar(128) NOT NULL DEFAULT '' COMMENT 'Username',
-    `password`   varchar(128) NOT NULL DEFAULT '' COMMENT 'Password',
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'User account create time',
-    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'User account update time',
-    `deleted_at` timestamp NULL DEFAULT NULL COMMENT 'User account delete time',
-    PRIMARY KEY (`id`),
-    KEY          `idx_username` (`username`) COMMENT 'Username index'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='User account table';
+    id          bigint auto_increment
+        primary key,
+    video_id    bigint          null,
+    user_id     bigint unsigned null,
+    content     longtext        null,
+    create_date longtext        null,
+    delate_at   tinyint(1)      null,
+    create_time bigint          null
+);
 
-CREATE TABLE `note`
+create index idx_comments_create_time
+    on comments (create_time);
+
+create index idx_comments_delate_at
+    on comments (delate_at);
+
+create index vd
+    on comments (video_id);
+
+create table favorites
 (
-    `id`         bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    `user_id`    int(64) NOT NULL DEFAULT 0 COMMENT 'UserID',
-    `title`      varchar(128) NOT NULL DEFAULT '' COMMENT 'Title',
-    `content`    TEXT NULL COMMENT 'Content',
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Note create time',
-    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Note update time',
-    `deleted_at` timestamp NULL DEFAULT NULL COMMENT 'Note delete time',
-    PRIMARY KEY (`id`),
-    KEY          `idx_user_id_title` (`user_id`, `title`) COMMENT 'UserID Title index'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Note table';
+    id          bigint auto_increment
+        primary key,
+    video_id    bigint     null,
+    user_id     bigint     null,
+    action_type int        null,
+    delate_at   tinyint(1) null
+);
+
+create index idx_favorites_delate_at
+    on favorites (delate_at);
+
+create index idx_member
+    on favorites (video_id, user_id);
+
+create index ua
+    on favorites (action_type);
+
+create index vu
+    on favorites (video_id, user_id);
+
+create table user
+(
+    id               bigint auto_increment
+        primary key,
+    name             longtext   null,
+    password         longtext   null,
+    follow_count     bigint     null,
+    follower_count   bigint     null,
+    avatar           longtext   null,
+    signature        longtext   null,
+    background_image longtext   null,
+    total_favorited  longtext   null,
+    is_follow        tinyint(1) null,
+    work_count       bigint     null,
+    favorite_count   bigint     null
+);
+
+create table videos
+(
+    id             bigint auto_increment
+        primary key,
+    author_id      bigint          null,
+    play_url       longtext        null,
+    cover_url      longtext        null,
+    favorite_count bigint unsigned null,
+    comment_count  bigint unsigned null,
+    title          longtext        null,
+    created_at     bigint          null
+);
+
+create index idx_videos_author_id
+    on videos (author_id);
+
+create index idx_videos_created_at
+    on videos (created_at);
+

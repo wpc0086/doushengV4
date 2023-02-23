@@ -47,8 +47,9 @@ func CommentAction(c *gin.Context) {
 
 func CommentList(c *gin.Context) {
 	vid := c.Query("video_id")
+	token := c.Query("token")
 	video_id, _ := strconv.ParseInt(vid, 10, 64)
-	response, err := rpc.CommentList(c.Copy(), &interact.CommentListRequest{VideoId: video_id})
+	response, err := rpc.CommentList(c.Copy(), &interact.CommentListRequest{VideoId: video_id, Token: token})
 	if err != nil {
 		c.JSON(http.StatusOK, response)
 		return

@@ -17,12 +17,14 @@ package dal
 
 import (
 	"doushengV4/cmd/interact/dal/db"
+	"doushengV4/cmd/interact/dal/redis"
 	"log"
 )
 
 // Init init dal
 func Init() {
 	db.Init() // mysql init
+	redis.InitRedis()
 	err := db.DB.AutoMigrate(&db.Favorite{})
 	if err != nil {
 		log.Println("迁移点赞表出错！！")

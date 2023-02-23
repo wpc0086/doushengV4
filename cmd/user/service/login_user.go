@@ -23,7 +23,9 @@ func (s *LoginUserService) LoginUser(req *user.LoginUserRequest) (user_id int64,
 	if err != nil {
 		return -1, "", errno.ServiceErr
 	}
-
+	if u.Id == 0 {
+		return -1, "", errno.LoginErr
+	}
 	//生成token
 	token, err = mw.CreateToken(u.Id, u.Name)
 	return u.Id, token, nil

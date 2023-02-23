@@ -4,6 +4,7 @@ import (
 	"doushengV4/cmd/api/middleware"
 	"doushengV4/cmd/api/rpc"
 	"doushengV4/kitex_gen/user"
+	"doushengV4/pkg/mw"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -12,6 +13,12 @@ import (
 func Register(c *gin.Context) {
 	u := new(user.RegisterUserRequest)
 	u.Username = c.Query("username")
+	//校验邮箱
+	format := mw.VerifyEmailFormat(u.Username)
+	if format != true {
+		c.JSON(http.StatusOK, Response{StatusCode: 10007, StatusMsg: "邮箱格式错误"})
+		return
+	}
 	u.Password = c.Query("password")
 	response, err := rpc.RegisterUser(c.Copy(), u)
 	if err != nil {

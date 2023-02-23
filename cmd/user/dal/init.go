@@ -17,12 +17,14 @@ package dal
 
 import (
 	"doushengV4/cmd/user/dal/db"
+	"doushengV4/cmd/user/dal/redis"
 	"log"
 )
 
 // Init init dal
 func Init() {
 	db.Init() // mysql init
+	redis.InitRedis()
 	err := db.DB.AutoMigrate(&db.User{})
 	if err != nil {
 		log.Println("迁移用户表出错！！")

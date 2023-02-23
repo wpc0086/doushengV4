@@ -18,6 +18,7 @@ package service
 import (
 	"context"
 	"doushengV4/cmd/publish/dal/db"
+	"doushengV4/cmd/publish/dal/redis"
 	"doushengV4/cmd/publish/util"
 	"doushengV4/kitex_gen/publish"
 	"doushengV4/pkg/consts"
@@ -48,6 +49,8 @@ func (s *ActionPublishService) ActionPulish(req *publish.ActionRequest) error {
 	}
 	fileName := strconv.Itoa(int(uuid.New().ID())) + ".mp4"
 	saveFile := filepath.Join(consts.SaveFilePlace, fileName)
+	//发布视频时，把发布列表缓存清除 -- 延迟双删
+	redis.RemovePublishList(s.ctx, claims.UserId)
 	//保存到本地的临时文件
 	err := SaveUploadedFile(req.Data, saveFile)
 	if err != nil {
@@ -86,7 +89,7 @@ func (s *ActionPublishService) ActionPulish(req *publish.ActionRequest) error {
 		}
 		defer wg.Done()
 	}(s.ctx, imageName, saveImg)
-	//保存到数据库
+	////保存到数据库
 	video := db.Video{
 		AuthorId:  claims.UserId,
 		Title:     req.Title,
@@ -110,6 +113,15 @@ func (s *ActionPublishService) ActionPulish(req *publish.ActionRequest) error {
 			return
 		}
 	}(saveFile, saveImg)
+	//判断用户info是否存在redis，有就更新
+	userExistRedis, _ := redis.GetInfo(s.ctx, claims.UserId)
+	if userExistRedis == true {
+		redis.UpdateInfo(s.ctx, claims.UserId)
+	}
+	//将视频插入视频feed的zset中
+	redis.SaveVideoAndImage(s.ctx, &video)
+	//发布视频时，把发布列表缓存清除 -- 延迟双删
+	redis.RemovePublishList(s.ctx, claims.UserId)
 	return nil
 }
 

@@ -91,6 +91,7 @@ func PublishList(c *gin.Context) {
 	}
 	r := new(publish.ListRequest)
 	r.UserId = uid
+	r.Token = c.Query("token")
 	response, err := rpc.ListPublish(c.Copy(), r)
 	if err != nil {
 		c.JSON(http.StatusOK, response)
@@ -110,6 +111,8 @@ func Feed(c *gin.Context) {
 	}
 	r := new(publish.FeedRequest)
 	r.LatestTime = &lTime
+	token := c.Query("token")
+	r.Token = &token
 	response, err := rpc.FeedPublish(c.Copy(), r)
 	if err != nil {
 		c.JSON(http.StatusOK, response)
