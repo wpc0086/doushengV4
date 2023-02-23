@@ -17,7 +17,6 @@ package consts
 
 import (
 	"golang.org/x/sys/unix"
-	"math/rand"
 	"time"
 )
 
@@ -65,12 +64,6 @@ const (
 	RediseErrorPre       = "error:%s"
 	RediseErrorExp       = 50 * time.Millisecond
 )
-
-// 防止缓存雪崩
-var RedisUserInfoExp = int64(time.Second) * (10 + rand.Int63n(10))
-var RedisVideoListExp = int64(time.Second) * (10 + rand.Int63n(10))
-var RedisFavoriteListExp = int64(time.Second) * (10 + rand.Int63n(10))
-var RedisCommentListExp = int64(time.Second) * (10 + rand.Int63n(10))
 
 //var Rountiue = windows.GetCurrentThreadId()
 

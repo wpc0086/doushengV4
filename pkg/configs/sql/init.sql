@@ -43,19 +43,12 @@ create index vu
 
 create table user
 (
-    id               bigint auto_increment
+    id             bigint auto_increment
         primary key,
-    name             longtext   null,
-    password         longtext   null,
-    follow_count     bigint     null,
-    follower_count   bigint     null,
-    avatar           longtext   null,
-    signature        longtext   null,
-    background_image longtext   null,
-    total_favorited  longtext   null,
-    is_follow        tinyint(1) null,
-    work_count       bigint     null,
-    favorite_count   bigint     null
+    name           longtext null,
+    password       longtext null,
+    follow_count   bigint   null,
+    follower_count bigint   null
 );
 
 create table videos

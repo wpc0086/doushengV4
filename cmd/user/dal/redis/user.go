@@ -6,6 +6,7 @@ import (
 	"doushengV4/pkg/consts"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -19,7 +20,7 @@ func SaveInfo(ctx context.Context, user *user.User, userId int64) (err error) {
 		return err
 	}
 	RedisClient.HMSet(ctx, userInfo, m)
-	RedisClient.Expire(ctx, userInfo, time.Duration(consts.RedisUserInfoExp))
+	RedisClient.Expire(ctx, userInfo, time.Duration(int64(time.Second)*(10+rand.Int63n(10))))
 	return nil
 }
 

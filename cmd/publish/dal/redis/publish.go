@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"math/rand"
 	"time"
 )
 
@@ -67,7 +68,7 @@ func SavePublishList(ctx context.Context, video []*publish.Video, userId int64) 
 	}
 	RedisClient.Set(ctx, videoList, data, 0)
 	//防止缓存雪崩
-	RedisClient.Expire(ctx, videoList, time.Duration(consts.RedisVideoListExp))
+	RedisClient.Expire(ctx, videoList, time.Duration(int64(time.Second)*(11+rand.Int63n(10))))
 	return nil
 }
 

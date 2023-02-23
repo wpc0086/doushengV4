@@ -6,6 +6,7 @@ import (
 	"doushengV4/pkg/consts"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func SaveFavoriteList(ctx context.Context, video []*interact.Video, userId int64
 	}
 	RedisClient.Set(ctx, videoList, data, 0)
 	//防止缓存雪崩
-	RedisClient.Expire(ctx, videoList, time.Duration(consts.RedisFavoriteListExp))
+	RedisClient.Expire(ctx, videoList, time.Duration(int64(time.Second)*(12+rand.Int63n(10))))
 	return nil
 }
 
@@ -56,7 +57,7 @@ func SaveCommentList(ctx context.Context, comments []*interact.Comment, userId i
 	}
 	RedisClient.Set(ctx, commentsList, data, 0)
 	//防止缓存雪崩
-	RedisClient.Expire(ctx, commentsList, time.Duration(consts.RedisCommentListExp))
+	RedisClient.Expire(ctx, commentsList, time.Duration(int64(time.Second)*(13+rand.Int63n(10))))
 	return nil
 }
 

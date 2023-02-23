@@ -38,7 +38,7 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, req *user.RegisterUs
 
 // LoginUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) LoginUser(ctx context.Context, req *user.LoginUserRequest) (resp *user.LoginResp, err error) {
-	if len(req.Password) <= 5 {
+	if len(req.Password) < 5 {
 		resp = pack.BuildLoginResp(errno.ParamErr)
 		return resp, nil
 	}
